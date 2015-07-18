@@ -56,6 +56,10 @@ public class RestClientUser {
             jsonObject.put("username",userName);
             jsonObject.put("password",password);
             String output = RestClient.POST(URL_LOGIN, jsonObject);
+            if(output.contains("success"))
+                return true;
+            else
+                return false;
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {

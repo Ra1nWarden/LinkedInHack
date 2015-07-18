@@ -4,13 +4,21 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by zihao on 7/17/15.
@@ -23,6 +31,7 @@ public class MainActivity extends Activity {
     private PhotosGridAdapter adapter;
     private ImageView cameraIcon;
     private ImageView refreshIcon;
+    private String photoPath;
 
     @Override
     public void onCreate(Bundle savedInstance) {
@@ -50,12 +59,29 @@ public class MainActivity extends Activity {
         cameraIcon.setClickable(true);
         cameraIcon.setOnClickListener(new View.OnClickListener() {
 
-
             @Override
             public void onClick(View v) {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                String imageFileName = "JPEG_" + timeStamp + "_";
+                File storageDir = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES);
+                try {
+                    File image = File.createTempFile(
+                            imageFileName,  /* prefix */
+                            ".jpg",         /* suffix */
+                            storageDir      /* directory */
+                    );
+                    // Save a file: path for use with ACTION_VIEW intents
+                    photoPath = "file:" + image.getAbsolutePath();
+                    if(image != null) {
+                        Log.d(TAG, "path is " + photoPath);
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                                Uri.fromFile(image));
+                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                    }
+                } catch (Exception e) {
+                    return;
                 }
             }
         });
@@ -85,11 +111,25 @@ public class MainActivity extends Activity {
             super.onActivityResult(requestCode, resultCode, data);
             return;
         }
-        if (resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Intent storyIntent = new Intent(this, NewStoryActivity.class);
-            storyIntent.putExtras(extras);
-            startActivity(storyIntent);
+        Log.d(TAG, "request is " + requestCode + " results is " + resultCode + " data is null ? " + (data == null));
+        if (resultCode == Activity.RESULT_OK) {
+            Log.d(TAG, "result ok");
+            try {
+                ExifInterface dataShit = new ExifInterface(photoPath);
+                Bundle extras = data.getExtras();
+                Intent storyIntent = new Intent(this, NewStoryActivity.class);
+                storyIntent.putExtras(extras);
+                float[] results = new float[2];
+                if (dataShit.getLatLong(results)) {
+                    storyIntent.putExtra("longitude", results[1]);
+                    storyIntent.putExtra("latitude", results[0]);
+                    startActivity(storyIntent);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+
         }
     }
 
