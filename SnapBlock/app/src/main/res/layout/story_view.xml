@@ -9,4 +9,11 @@
         android:layout_height="150dp"
         android:scrollbars="horizontal"></android.support.v7.widget.RecyclerView>
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/story_comments_list"
+        android:layout_below="@id/story_photos_list"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:scrollbars="horizontal"></android.support.v7.widget.RecyclerView>
+
 </RelativeLayout>

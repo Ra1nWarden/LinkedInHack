@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "onItemSelected");
-                Intent startStoryIntent = new Intent(MainActivity.this, NewStoryActivity.class);
+                Intent startStoryIntent = new Intent(MainActivity.this, StoryActivity.class);
                 startActivity(startStoryIntent);
             }
         });
