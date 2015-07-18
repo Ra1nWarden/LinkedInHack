@@ -1,0 +1,44 @@
+//the return all storys call json output format
+
+{  
+   "stories":[  
+      {  
+         "name":"cool trip",
+         "storyid":"1",
+         "timestamp":"2015-07-17 23:18:48",
+         "upvote":"3",
+         "downvote":"2",
+         "urls":[  
+            "www.sample.com",
+            "www.temp.com"
+         ],
+         "comments":[  
+            {  
+               "commentid":"1",
+               "comment":"this is sick",
+               "upvote":"1",
+               "downvote":"0"
+            },
+            {  
+               "commentid":"2",
+               "comment":"cool stuff",
+               "upvote":"5",
+               "downvote":"0"
+            }
+         ]
+      },
+      {  
+         "name":"nasty trip",
+         "storyid":"711",
+         "timestamp":"2015-07-17 23:46:42",
+         "upvote":"1",
+         "downvote":"3",
+         "urls":[  
+
+         ],
+         "comments":[  
+
+         ]
+      }
+   ]
+}
