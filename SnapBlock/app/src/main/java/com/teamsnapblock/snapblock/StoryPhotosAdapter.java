@@ -1,9 +1,12 @@
 package com.teamsnapblock.snapblock;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -39,7 +42,7 @@ public class StoryPhotosAdapter extends RecyclerView.Adapter<StoryPhotosAdapter.
         return photos.size();
     }
 
-    public static class PhotoViewHolder extends RecyclerView.ViewHolder {
+    public static class PhotoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         FrameLayout userPhotoHolder;
         ImageView actualPhoto;
@@ -49,7 +52,21 @@ public class StoryPhotosAdapter extends RecyclerView.Adapter<StoryPhotosAdapter.
             super(view);
             userPhotoHolder = view;
             actualPhoto = (ImageView) view.findViewById(R.id.story_photo);
+            actualPhoto.setVisibility(View.INVISIBLE);
             coverPhoto = (ImageView) view.findViewById(R.id.cover_photo);
+            coverPhoto.setOnClickListener(PhotoViewHolder.this);
+            actualPhoto.setOnClickListener(PhotoViewHolder.this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (coverPhoto.getVisibility() == View.VISIBLE) {
+                coverPhoto.setVisibility(View.INVISIBLE);
+                actualPhoto.setVisibility(View.VISIBLE);
+            } else {
+                coverPhoto.setVisibility(View.VISIBLE);
+                actualPhoto.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
