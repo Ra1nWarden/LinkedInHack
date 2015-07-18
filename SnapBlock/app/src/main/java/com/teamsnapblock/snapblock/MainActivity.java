@@ -22,6 +22,7 @@ public class MainActivity extends Activity {
     private GridView gridView;
     private PhotosGridAdapter adapter;
     private ImageView cameraIcon;
+    private ImageView refreshIcon;
 
     @Override
     public void onCreate(Bundle savedInstance) {
@@ -40,6 +41,7 @@ public class MainActivity extends Activity {
             }
         });
         setUpNewStory();
+        setUpRefresh();
         addSamples();
     }
 
@@ -55,6 +57,17 @@ public class MainActivity extends Activity {
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 }
+            }
+        });
+    }
+
+    private void setUpRefresh() {
+        refreshIcon = (ImageView) findViewById(R.id.refresh_icon);
+        refreshIcon.setClickable(true);
+        refreshIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Refresh
             }
         });
     }
