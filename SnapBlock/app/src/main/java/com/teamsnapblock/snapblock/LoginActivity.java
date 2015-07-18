@@ -22,7 +22,9 @@ public class LoginActivity extends Activity {
         String userName = userNameField.getText().toString();
         EditText passwordField = (EditText) findViewById(R.id.password);
         String password = passwordField.getText().toString();
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        if(RestClientUser.login(userName, password)) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
     }
 }
