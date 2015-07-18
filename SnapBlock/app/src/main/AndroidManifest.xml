@@ -3,6 +3,8 @@
 
     <application android:allowBackup="true" android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher" android:theme="@style/AppTheme">
+
+        <uses-sdk android:minSdkVersion="21"/>
         
         <activity
             android:name="com.teamsnapblock.snapblock.MainActivity">
