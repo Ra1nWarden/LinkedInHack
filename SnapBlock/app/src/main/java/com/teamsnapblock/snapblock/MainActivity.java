@@ -2,6 +2,7 @@ package com.teamsnapblock.snapblock;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
+    public static final int REQUEST_IMAGE_CAPTURE = 1;
     private GridView gridView;
     private PhotosGridAdapter adapter;
     private ImageView cameraIcon;
@@ -45,7 +47,7 @@ public class MainActivity extends Activity {
         cameraIcon = (ImageView) findViewById(R.id.camera_icon);
         cameraIcon.setClickable(true);
         cameraIcon.setOnClickListener(new View.OnClickListener() {
-            public static final int REQUEST_IMAGE_CAPTURE = 1;
+
 
             @Override
             public void onClick(View v) {
@@ -64,6 +66,19 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode != REQUEST_IMAGE_CAPTURE) {
+            super.onActivityResult(requestCode, resultCode, data);
+            return;
+        }
+        if (resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Intent storyIntent = new Intent(this, NewStoryActivity.class);
+            storyIntent.putExtras(extras);
+            startActivity(storyIntent);
+        }
+    }
 
 
 }
