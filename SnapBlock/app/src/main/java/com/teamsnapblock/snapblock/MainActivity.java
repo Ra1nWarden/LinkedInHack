@@ -1,8 +1,11 @@
 package com.teamsnapblock.snapblock;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -15,8 +18,13 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.teamsnapblock.snapblock.model.Story;
+import com.teamsnapblock.snapblock.model.StoryList;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -51,7 +59,13 @@ public class MainActivity extends Activity {
         });
         setUpNewStory();
         setUpRefresh();
-        addSamples();
+        StoryList storyList = RestClientUser.getStoryList();
+        for (Story story : storyList.getStories()) {
+            Log.d(TAG, "size is " + story.getUrls().size());
+            if(story.getUrls().size() > 0) {
+                adapter.add(story.getUrls().get(0));
+            }
+        }
     }
 
     private void setUpNewStory() {
@@ -61,28 +75,9 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                String imageFileName = "JPEG_" + timeStamp + "_";
-                File storageDir = Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES);
-                try {
-                    File image = File.createTempFile(
-                            imageFileName,  /* prefix */
-                            ".jpg",         /* suffix */
-                            storageDir      /* directory */
-                    );
-                    // Save a file: path for use with ACTION_VIEW intents
-                    photoPath = "file:" + image.getAbsolutePath();
-                    if(image != null) {
-                        Log.d(TAG, "path is " + photoPath);
-                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                                Uri.fromFile(image));
-                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                    }
-                } catch (Exception e) {
-                    return;
-                }
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
             }
         });
     }
@@ -98,39 +93,90 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void addSamples() {
-        Drawable sampleDrawable = getResources().getDrawable(R.drawable.green_mushroom, null);
-        for (int i = 0; i < 9; i++) {
-            adapter.add(sampleDrawable);
+//    private void addSamples() {
+//        Drawable sampleDrawable = getResources().getDrawable(R.drawable.green_mushroom, null);
+//        for (int i = 0; i < 9; i++) {
+//            adapter.add(sampleDrawable);
+//        }
+//    }
+
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != REQUEST_IMAGE_CAPTURE) {
-            super.onActivityResult(requestCode, resultCode, data);
-            return;
-        }
-        Log.d(TAG, "request is " + requestCode + " results is " + resultCode + " data is null ? " + (data == null));
-        if (resultCode == Activity.RESULT_OK) {
-            Log.d(TAG, "result ok");
-            try {
-                ExifInterface dataShit = new ExifInterface(photoPath);
-                Bundle extras = data.getExtras();
-                Intent storyIntent = new Intent(this, NewStoryActivity.class);
-                storyIntent.putExtras(extras);
-                float[] results = new float[2];
-                if (dataShit.getLatLong(results)) {
-                    storyIntent.putExtra("longitude", results[1]);
-                    storyIntent.putExtra("latitude", results[0]);
-                    startActivity(storyIntent);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
+//        if (requestCode != REQUEST_IMAGE_CAPTURE) {
+//            super.onActivityResult(requestCode, resultCode, data);
+//            return;
+//        }
+//        Log.d(TAG, "request is " + requestCode + " results is " + resultCode + " data is null ? " + (data == null));
+//        if (resultCode == Activity.RESULT_OK) {
+//            Log.d(TAG, "result ok");
+//            try {
+//                ExifInterface dataShit = new ExifInterface(photoPath);
+//                if (data != null) {
+//                    Bundle extras = data.getExtras();
+//                }
+//                Intent storyIntent = new Intent(this, NewStoryActivity.class);
+//                //storyIntent.putExtras(extras);
+//                float[] results = new float[2];
+//                if (dataShit.getLatLong(results)) {
+//                    storyIntent.putExtra("longitude", results[1]);
+//                    storyIntent.putExtra("latitude", results[0]);
+//                    startActivity(storyIntent);
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                return;
+//            }
+//
+//        }
 
+        if(data == null)
+            return;
+
+        Uri pickedPhoto = data.getData();
+        try {
+            Log.d(TAG, "I AM ALIVE");
+            String filePath = getRealPathFromURI(this, pickedPhoto);
+            ExifInterface dataShit = new ExifInterface(filePath);
+            float[] results = new float[2];
+            Log.d(TAG, "before if");
+            if (dataShit.getLatLong(results)) {
+                Log.d(TAG, "lat is " + results[0]);
+                Log.d(TAG, "lon is " + results[1]);
+                Bitmap photoData = BitmapFactory.decodeFile(filePath);
+                Intent newStoryIntent = new Intent(this, NewStoryActivity.class);
+                Bundle args = new Bundle();
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                photoData.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+                args.putByteArray("photo", outputStream.toByteArray());
+                newStoryIntent.putExtras(args);
+                newStoryIntent.putExtra("lat", results[0]);
+                newStoryIntent.putExtra("lon", results[1]);
+                Log.d(TAG, "before start");
+                startActivity(newStoryIntent);
+            } else {
+                Log.d(TAG, "ERROR");
+            }
+        } catch (IOException e) {
+            Log.d(TAG, "IO Exception");
+            e.printStackTrace();
         }
+
+
     }
 
 

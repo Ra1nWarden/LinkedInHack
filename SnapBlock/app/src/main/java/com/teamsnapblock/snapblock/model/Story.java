@@ -4,6 +4,14 @@ package com.teamsnapblock.snapblock.model;
  * Created by louyang on 7/18/15.
  */
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -196,8 +204,12 @@ public class Story {
      * The urls
      */
     @JsonProperty("urls")
-    public List<Object> getUrls() {
-        return urls;
+    public List<Bitmap> getUrls() {
+        List<Bitmap> list = new ArrayList<Bitmap>();
+        for(Object url:urls){
+            list.add(getBitmapFromURL("http://10.16.21.173/hackthon/"+(String)url));
+        }
+        return list;
     }
 
     /**
@@ -238,6 +250,23 @@ public class Story {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+    public static Bitmap getBitmapFromURL(String src) {
+        try {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            // Log exception
+            return null;
+        }
+        return null;
     }
 
 }

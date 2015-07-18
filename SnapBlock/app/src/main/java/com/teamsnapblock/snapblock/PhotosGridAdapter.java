@@ -1,6 +1,7 @@
 package com.teamsnapblock.snapblock;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +15,7 @@ import java.util.zip.Inflater;
 /**
  * Created by zihao on 7/17/15.
  */
-public class PhotosGridAdapter extends ArrayAdapter<Drawable> {
+public class PhotosGridAdapter extends ArrayAdapter<Bitmap> {
 
     private final Context context;
 
@@ -27,7 +28,7 @@ public class PhotosGridAdapter extends ArrayAdapter<Drawable> {
     public View getView(int position, View convertView, ViewGroup parent) {
         RelativeLayout photoViewHolder = (RelativeLayout) LayoutInflater.from(context).inflate(R.layout.photo_grid, parent, false);
         ImageView photoView = (ImageView) photoViewHolder.findViewById(R.id.photo);
-        photoView.setImageDrawable(getItem(position));
+        photoView.setImageBitmap(getItem(position));
         return photoView;
     }
 }

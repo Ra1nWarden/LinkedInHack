@@ -2,6 +2,7 @@ package com.teamsnapblock.snapblock;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -18,17 +19,18 @@ public class NewStoryActivity extends Activity {
     public void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         setContentView(R.layout.add_story);
-        Bundle extras = getIntent().getExtras();
         ImageView preview = (ImageView) findViewById(R.id.cover_preview);
-        cover = (Bitmap) extras.get("data");
+        Bundle bundle = getIntent().getExtras();
+        byte[] bytes = bundle.getByteArray("photo");
+        cover = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         preview.setImageBitmap(cover);
     }
 
     public void done(View view) {
         EditText titleField = (EditText) findViewById(R.id.title_field);
         String enteredText = titleField.getText().toString();
-        float lat = getIntent().getFloatExtra("latitude", -1);
-        float lon = getIntent().getFloatExtra("longtitude", -1);
+        float lat = getIntent().getFloatExtra("lat", -1);
+        float lon = getIntent().getFloatExtra("lon", -1);
         RestClientUser.createStory(cover, lon, lat, enteredText);
         // send to server.
         finish();
