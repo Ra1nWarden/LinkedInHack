@@ -2,6 +2,7 @@ package com.teamsnapblock.snapblock;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.teamsnapblock.snapblock.model.StoryList;
 
 import org.apache.http.Header;
 import org.json.JSONArray;

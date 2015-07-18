@@ -1,6 +1,6 @@
 package com.teamsnapblock.snapblock;
 
-import com.teamsnapblock.snapblock.com.teamsnapblock.snapblock.models.StoryList;
+import com.teamsnapblock.snapblock.model.StoryList;
 import com.loopj.android.http.*;
 
 /**

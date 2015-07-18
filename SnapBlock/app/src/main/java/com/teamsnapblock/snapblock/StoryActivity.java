@@ -40,7 +40,7 @@ public class StoryActivity extends Activity {
         mapIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(StoryActivity.this, MapActivity.class);
+                Intent intent = new Intent(StoryActivity.this, MapsActivity.class);
                 startActivity(intent);
             }
         });
